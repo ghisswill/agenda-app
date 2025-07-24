@@ -13,4 +13,5 @@ public interface EventService {
     Event updateEvent(UpdateEventCommand command, UUID userId);
     void deleteEvent(Long eventId, UUID userId);
     List<Event> getEventsForUser(UUID userId);
+    Event getEventById(Long id, UUID userId);
 }

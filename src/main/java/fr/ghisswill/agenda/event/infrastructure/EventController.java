@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -35,8 +34,6 @@ public class EventController {
             @PathVariable Long id,
             @RequestBody UpdateEventCommand command,
             Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
-
         UpdateEventCommand updateEventCommand = new UpdateEventCommand(
                 id,
                 command.title(),
@@ -45,19 +42,26 @@ public class EventController {
                 command.endTime()
         );
 
-        return new ResponseEntity<>(eventService.updateEvent(updateEventCommand, userId), HttpStatus.OK);
+        return new ResponseEntity<>(eventService.updateEvent(updateEventCommand, getUserId(authentication)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
-        eventService.deleteEvent(id, userId);
+        eventService.deleteEvent(id, getUserId(authentication));
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents(Authentication authentication) {
-        UUID userId = UUID.fromString(authentication.getName());
-        return new ResponseEntity<>(eventService.getEventsForUser(userId), HttpStatus.OK);
+        return new ResponseEntity<>(eventService.getEventsForUser(getUserId(authentication)), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Event> getEventById(@PathVariable Long id, Authentication authentication) {
+        return new ResponseEntity<>(eventService.getEventById(id, getUserId(authentication)), HttpStatus.OK);
+    }
+
+    private UUID getUserId(Authentication authentication) {
+       return UUID.fromString(authentication.getName());
     }
 }

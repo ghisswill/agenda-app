@@ -10,6 +10,7 @@ import fr.ghisswill.agenda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,6 +63,18 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getEventsForUser(UUID userId) {
         return eventRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public Event getEventById(Long id, UUID userId) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
+
+        if (!event.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Accès refusé");
+        }
+
+        return event;
     }
 
 }
