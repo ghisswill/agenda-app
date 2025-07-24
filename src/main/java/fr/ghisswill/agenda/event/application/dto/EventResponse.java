@@ -14,8 +14,8 @@ public record EventResponse(
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
-                event.getStartDate(),
-                event.getEndDate()
+                event.getStartTime(),
+                event.getEndTime()
         );
     }
 

@@ -10,10 +10,8 @@ import fr.ghisswill.agenda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
-import java.nio.file.AccessDeniedException;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +29,8 @@ public class EventServiceImpl implements EventService {
         Event event = Event.builder()
                 .title(command.title())
                 .description(command.description())
-                .startDate(command.startDate())
-                .endDate(command.endDate())
+                .startTime(command.startDate())
+                .endTime(command.endDate())
                 .user(user)
                 .build();
 
