@@ -17,4 +17,6 @@ public interface EventService {
     List<Event> getEventsForUser(UUID userId);
     Event getEventById(Long id, UUID userId);
     List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    List<Event> getTodayEvents(UUID userId);
+    List<Event> getThisWeekEvents(UUID userId);
 }

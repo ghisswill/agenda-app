@@ -78,6 +78,16 @@ public class EventController {
         return new ResponseEntity<>( events, HttpStatus.OK);
     }
 
+    @GetMapping("/today")
+    public ResponseEntity<List<Event>> getTodayEvents(Authentication authentication) {
+        return new ResponseEntity<>(eventService.getTodayEvents(getUserId(authentication)), HttpStatus.OK);
+    }
+
+    @GetMapping("/this-week")
+    public ResponseEntity<List<Event>> getThisWeekEvents(Authentication authentication) {
+        return new ResponseEntity<>(eventService.getThisWeekEvents(getUserId(authentication)), HttpStatus.OK);
+    }
+
     private UUID getUserId(Authentication authentication) {
        return UUID.fromString(authentication.getName());
     }

@@ -11,7 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,6 +86,23 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
         return eventRepository.findByUserIdAndDateRange(userId, start, end, pageable);
+    }
+
+    @Override
+    public List<Event> getTodayEvents(UUID userId) {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1).minusNanos(1);
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, null);
+    }
+
+    @Override
+    public List<Event> getThisWeekEvents(UUID userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+        LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
+        LocalDateTime start = startOfWeek.atStartOfDay();
+        LocalDateTime end = endOfWeek.atTime(LocalTime.MAX);
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, null);
     }
 
 }
