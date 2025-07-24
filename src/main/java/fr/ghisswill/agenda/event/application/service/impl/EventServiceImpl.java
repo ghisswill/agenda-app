@@ -10,6 +10,7 @@ import fr.ghisswill.agenda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -80,8 +81,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end) {
-        return eventRepository.findByUserIdAndDateRange(userId, start, end);
+    public List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, pageable);
     }
 
 }

@@ -4,6 +4,7 @@ import fr.ghisswill.agenda.event.application.command.CreateEventCommand;
 import fr.ghisswill.agenda.event.application.command.UpdateEventCommand;
 import fr.ghisswill.agenda.event.domain.model.Event;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -15,5 +16,5 @@ public interface EventService {
     void deleteEvent(Long eventId, UUID userId);
     List<Event> getEventsForUser(UUID userId);
     Event getEventById(Long id, UUID userId);
-    List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end);
+    List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 }

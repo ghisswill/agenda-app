@@ -6,12 +6,14 @@ import fr.ghisswill.agenda.event.application.service.EventService;
 import fr.ghisswill.agenda.event.domain.model.Event;
 import fr.ghisswill.agenda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,11 +66,12 @@ public class EventController {
     public ResponseEntity<List<Event>> getEvents(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime end,
+            @PageableDefault(size = 10, sort = "startTime") Pageable pageable,
             Authentication authentication
             ) {
         List<Event> events;
         if(start != null && end != null) {
-            events = eventService.getEventsInDateRange(getUserId(authentication), start, end);
+            events = eventService.getEventsInDateRange(getUserId(authentication), start, end, pageable);
         } else {
             events = eventService.getEventsForUser(getUserId(authentication));
         }
