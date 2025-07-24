@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,6 +77,11 @@ public class EventServiceImpl implements EventService {
         }
 
         return event;
+    }
+
+    @Override
+    public List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end) {
+        return eventRepository.findByUserIdAndDateRange(userId, start, end);
     }
 
 }
