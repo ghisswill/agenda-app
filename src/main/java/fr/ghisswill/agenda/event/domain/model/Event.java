@@ -29,7 +29,6 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
 
     public Long getId() {

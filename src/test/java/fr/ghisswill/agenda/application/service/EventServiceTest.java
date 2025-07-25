@@ -1,6 +1,7 @@
 package fr.ghisswill.agenda.application.service;
 
 import fr.ghisswill.agenda.event.application.command.CreateEventCommand;
+import fr.ghisswill.agenda.event.application.dto.EventResponse;
 import fr.ghisswill.agenda.event.application.service.impl.EventServiceImpl;
 import fr.ghisswill.agenda.event.domain.model.Event;
 import fr.ghisswill.agenda.event.domain.repository.EventRepository;
@@ -51,12 +52,12 @@ public class EventServiceTest {
         when(eventRepository.save(any(Event.class))).thenAnswer(i -> i.getArgument(0));
 
         // when
-        Event event = eventServiceImpl.createEvent(command);
+        EventResponse event = eventServiceImpl.createEvent(command);
 
         // then
         assertThat(event).isNotNull();
-        assertThat(event.getTitle()).isEqualTo(command.title());
-        assertThat(event.getUser()).isEqualTo(usr);
+        assertThat(event.title()).isEqualTo(command.title());
+        assertThat(event.userId()).isEqualTo(usr.getId());
         verify(eventRepository).save(any(Event.class));
     }
 
@@ -91,9 +92,9 @@ public class EventServiceTest {
 
         when(eventRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(e1, e2));
 
-        List<Event> events = eventServiceImpl.getEventsForUser(userId);
+        List<EventResponse> events = eventServiceImpl.getEventsForUser(userId);
 
         assertThat(events).hasSize(2);
-        assertThat(events.get(0).getId()).isEqualTo(1L);
+        assertThat(events.get(0).id()).isEqualTo(1L);
     }
 }

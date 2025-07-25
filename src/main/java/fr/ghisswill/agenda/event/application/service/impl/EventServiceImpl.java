@@ -2,6 +2,8 @@ package fr.ghisswill.agenda.event.application.service.impl;
 
 import fr.ghisswill.agenda.event.application.command.CreateEventCommand;
 import fr.ghisswill.agenda.event.application.command.UpdateEventCommand;
+import fr.ghisswill.agenda.event.application.dto.EventResponse;
+import fr.ghisswill.agenda.event.application.mapper.EventMapper;
 import fr.ghisswill.agenda.event.application.service.EventService;
 import fr.ghisswill.agenda.event.domain.model.Event;
 import fr.ghisswill.agenda.event.domain.repository.EventRepository;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
 
     @Override
-    public Event createEvent(CreateEventCommand command) {
+    public EventResponse createEvent(CreateEventCommand command) {
         User user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -38,11 +41,11 @@ public class EventServiceImpl implements EventService {
                 .user(user)
                 .build();
 
-        return eventRepository.save(event);
+        return EventMapper.INSTANCE.toDto(eventRepository.save(event));
     }
 
     @Override
-    public Event updateEvent(UpdateEventCommand command, UUID userId) {
+    public EventResponse updateEvent(UpdateEventCommand command, UUID userId) {
         Event event = eventRepository.findById(command.eventId())
                 .orElseThrow(() -> new RuntimeException("Événement introuvable"));
 
@@ -51,7 +54,7 @@ public class EventServiceImpl implements EventService {
         }
 
         event.update(command.title(), command.description(), command.startTime(), command.endTime());
-        return eventRepository.save(event);
+        return EventMapper.INSTANCE.toDto(eventRepository.save(event));
     }
 
     @Override
@@ -66,12 +69,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> getEventsForUser(UUID userId) {
-        return eventRepository.findAllByUserId(userId);
+    public List<EventResponse> getEventsForUser(UUID userId) {
+        return eventRepository.findAllByUserId(userId)
+                .stream().map(EventMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public Event getEventById(Long id, UUID userId) {
+    public EventResponse getEventById(Long id, UUID userId) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Événement non trouvé"));
 
@@ -79,29 +83,32 @@ public class EventServiceImpl implements EventService {
             throw new RuntimeException("Accès refusé");
         }
 
-        return event;
+        return EventMapper.INSTANCE.toDto(event);
     }
 
     @Override
-    public List<Event> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        return eventRepository.findByUserIdAndDateRange(userId, start, end, pageable);
+    public List<EventResponse> getEventsInDateRange(UUID userId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, pageable)
+                .stream().map(EventMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Event> getTodayEvents(UUID userId) {
+    public List<EventResponse> getTodayEvents(UUID userId) {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = start.plusDays(1).minusNanos(1);
-        return eventRepository.findByUserIdAndDateRange(userId, start, end, null);
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, null)
+                .stream().map(EventMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Event> getThisWeekEvents(UUID userId) {
+    public List<EventResponse> getThisWeekEvents(UUID userId) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
         LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
         LocalDateTime start = startOfWeek.atStartOfDay();
         LocalDateTime end = endOfWeek.atTime(LocalTime.MAX);
-        return eventRepository.findByUserIdAndDateRange(userId, start, end, null);
+        return eventRepository.findByUserIdAndDateRange(userId, start, end, null)
+                .stream().map(EventMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
 }

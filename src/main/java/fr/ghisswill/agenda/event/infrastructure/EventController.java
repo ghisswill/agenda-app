@@ -2,6 +2,7 @@ package fr.ghisswill.agenda.event.infrastructure;
 
 import fr.ghisswill.agenda.event.application.command.CreateEventCommand;
 import fr.ghisswill.agenda.event.application.command.UpdateEventCommand;
+import fr.ghisswill.agenda.event.application.dto.EventResponse;
 import fr.ghisswill.agenda.event.application.service.EventService;
 import fr.ghisswill.agenda.event.domain.model.Event;
 import fr.ghisswill.agenda.user.domain.model.CustomUserDetails;
@@ -31,13 +32,13 @@ public class EventController {
     private final UserRepository userRepository;
 
     @PostMapping
-    public ResponseEntity<Event> create(@RequestBody CreateEventCommand command) {
-        Event event = eventService.createEvent(command);
-        return ResponseEntity.created(URI.create("/api/events/" + event.getId())).body(event);
+    public ResponseEntity<EventResponse> create(@RequestBody CreateEventCommand command) {
+        EventResponse event = eventService.createEvent(command);
+        return ResponseEntity.created(URI.create("/api/events/" + event.id())).body(event);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Event> update(
+    public ResponseEntity<EventResponse> update(
             @PathVariable Long id,
             @RequestBody UpdateEventCommand command,
             Authentication authentication) {
@@ -59,18 +60,18 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<EventResponse> getEventById(@PathVariable Long id, Authentication authentication) {
         return new ResponseEntity<>(eventService.getEventById(id, getUserId(authentication)), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<Event>> getEvents(
+    public ResponseEntity<List<EventResponse>> getEvents(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime end,
             @PageableDefault(size = 10, sort = "startTime") Pageable pageable,
             Authentication authentication
             ) {
-        List<Event> events;
+        List<EventResponse> events;
         if(start != null && end != null) {
             events = eventService.getEventsInDateRange(getUserId(authentication), start, end, pageable);
         } else {
@@ -80,12 +81,12 @@ public class EventController {
     }
 
     @GetMapping("/today")
-    public ResponseEntity<List<Event>> getTodayEvents(Authentication authentication) {
+    public ResponseEntity<List<EventResponse>> getTodayEvents(Authentication authentication) {
         return new ResponseEntity<>(eventService.getTodayEvents(getUserId(authentication)), HttpStatus.OK);
     }
 
     @GetMapping("/this-week")
-    public ResponseEntity<List<Event>> getThisWeekEvents(Authentication authentication) {
+    public ResponseEntity<List<EventResponse>> getThisWeekEvents(Authentication authentication) {
         return new ResponseEntity<>(eventService.getThisWeekEvents(getUserId(authentication)), HttpStatus.OK);
     }
 
