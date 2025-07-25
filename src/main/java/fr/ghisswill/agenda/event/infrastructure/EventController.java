@@ -4,6 +4,7 @@ import fr.ghisswill.agenda.event.application.command.CreateEventCommand;
 import fr.ghisswill.agenda.event.application.command.UpdateEventCommand;
 import fr.ghisswill.agenda.event.application.service.EventService;
 import fr.ghisswill.agenda.event.domain.model.Event;
+import fr.ghisswill.agenda.user.domain.model.CustomUserDetails;
 import fr.ghisswill.agenda.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
@@ -89,6 +90,8 @@ public class EventController {
     }
 
     private UUID getUserId(Authentication authentication) {
-       return UUID.fromString(authentication.getName());
+       if (authentication.getPrincipal() instanceof CustomUserDetails userDetails)
+           return userDetails.getUserId();
+       return null;
     }
 }

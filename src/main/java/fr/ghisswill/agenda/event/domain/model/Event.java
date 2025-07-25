@@ -1,5 +1,6 @@
 package fr.ghisswill.agenda.event.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.ghisswill.agenda.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     public Long getId() {

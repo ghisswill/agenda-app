@@ -13,6 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -35,21 +37,25 @@ public class AuthServiceTest {
     }
 
     @Test
-    void ShouldRegisterUserAndReturnToken() {
-        RegisterRequest request = new RegisterRequest("test@ghss.fr","password123");
+    void ShouldRegisterUserAndReturnUserId() {
+        RegisterRequest request = new RegisterRequest("test@ghss.fr", "password123");
+        UUID userId = UUID.randomUUID(); // sans ID
+        User savedUser = new User(userId, request.email(), "encoded_pw", Role.USER);       // avec ID (mock retour)
 
-        when(passwordEncoder.encode("password1223")).thenReturn("encoded_pw");
-        when(jwtService.generateToken(any())).thenReturn("jwt_token");
+        when(passwordEncoder.encode("password123")).thenReturn("encoded_pw");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        AuthResponse response = authService.register(request);
+        UUID response = authService.register(request);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
 
-        User savedUser = userCaptor.getValue();
-        assertThat(savedUser.getEmail()).isEqualTo("test@ghss.fr");
-        assertThat(savedUser.getRole()).isEqualTo(Role.USER);
+        User capturedUser = userCaptor.getValue();
+        assertThat(capturedUser.getEmail()).isEqualTo("test@ghss.fr");
+        assertThat(capturedUser.getRole()).isEqualTo(Role.USER);
+        assertThat(capturedUser.getPassword()).isEqualTo("encoded_pw");
 
-        assertThat(response.token()).isEqualTo("jwt_token");
+        assertThat(response).isEqualTo(userId);
     }
+
 }

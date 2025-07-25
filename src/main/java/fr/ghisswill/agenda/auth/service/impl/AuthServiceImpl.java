@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -41,15 +43,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse register(RegisterRequest request) {
+    public UUID register(RegisterRequest request) {
         String encodedPw = passwordEncoder.encode(request.password());
         User user = User.builder()
                 .email(request.email())
                 .password(encodedPw)
                 .role(Role.USER)
                 .build();
-        userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
-        return new AuthResponse(jwtToken);
+        return userRepository.save(user).getId();
     }
 }

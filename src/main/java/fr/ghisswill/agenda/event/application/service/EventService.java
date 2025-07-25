@@ -5,6 +5,7 @@ import fr.ghisswill.agenda.event.application.command.UpdateEventCommand;
 import fr.ghisswill.agenda.event.domain.model.Event;
 
 import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
